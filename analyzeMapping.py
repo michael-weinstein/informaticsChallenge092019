@@ -8,10 +8,9 @@ def readInputs(mapFilePath:str, queryFilePath:str):
             raise KeyError("A query was submitted for transcript %s, but this transcript was not found in the mapping data. Found transcripts: %s" %(query.transcriptID, list(transcriptMaps.keys())))
     return transcriptMaps, queryList
 
-def calculateMapPosition(transcriptMap:mapperSupport.inputReader.MappingLine, query:mapperSupport.inputReader.QueryLine):
+def calculateMapPositionByTranscript(transcriptMap:mapperSupport.inputReader.MappingLine, query:mapperSupport.inputReader.QueryLine):
     readPosition = 0
     referencePosition = transcriptMap.transcriptStart
-    completed = False
     for count, operator in transcriptMap.cigar:
         for i in range(count):
             if readPosition >= query.position:
@@ -26,7 +25,7 @@ def generateMappingData(transcriptMaps:dict, query:mapperSupport.inputReader.Que
     if not query.transcriptID in transcriptMaps:
         raise KeyError("Transcript %s from query %s was not found in transcript maps. Transcripts in transcript maps: %s" %(query.transcriptID, query, list(transcriptMaps.keys())))
     transcriptMap = transcriptMaps[query.transcriptID]
-    mapPosition = calculateMapPosition(transcriptMap, query)
+    mapPosition = calculateMapPositionByTranscript(transcriptMap, query)
     return query.transcriptID, query.position, transcriptMap.contig, mapPosition
 
 
